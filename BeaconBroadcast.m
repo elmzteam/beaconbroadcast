@@ -76,8 +76,8 @@ RCT_EXPORT_METHOD(stopSharedAdvertisingBeacon)
     }
 
     CLBeaconRegion *region = [[CLBeaconRegion alloc] initWithProximityUUID:self.beaconRegion.proximityUUID
-                                                                     major:self.beaconRegion.major
-                                                                     minor:self.beaconRegion.minor
+                                                                     major:self.beaconRegion.major >> 4
+                                                                     minor:self.beaconRegion.minor >> 4
                                                                 identifier:self.beaconRegion.identifier];
     NSDictionary *beaconPeripheralData = [region peripheralDataWithMeasuredPower:nil];
     [self.peripheralManager startAdvertising:beaconPeripheralData];
