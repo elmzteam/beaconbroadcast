@@ -15,8 +15,8 @@ var NativeBeaconBroadcast = NativeModules.BeaconBroadcast;
  */
 
 var BeaconBroadcast = {
-  startAdvertisingBeaconWithString: function (uuid, identifier) {
-    NativeBeaconBroadcast.startSharedAdvertisingBeaconWithString(uuid, identifier);
+  startAdvertisingBeaconWithString: function (uuid, identifier, major, minor) {
+    NativeBeaconBroadcast.startSharedAdvertisingBeaconWithString(uuid, identifier, major, minor);
   },
 
   stopAdvertisingBeacon: function () {

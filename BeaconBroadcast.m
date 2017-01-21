@@ -12,9 +12,9 @@
 
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_METHOD(startSharedAdvertisingBeaconWithString:(NSString *)uuid identifier:(NSString *)identifier)
+RCT_EXPORT_METHOD(startSharedAdvertisingBeaconWithString:(NSString *)uuid identifier:(NSString *)identifier major:(int)major minor:(int)minor)
 {
-    [[BeaconBroadcast sharedInstance] startAdvertisingBeaconWithString: uuid identifier: identifier];
+    [[BeaconBroadcast sharedInstance] startAdvertisingBeaconWithString: uuid identifier: identifier major: major minor: minor];
 }
 
 RCT_EXPORT_METHOD(stopSharedAdvertisingBeacon)
@@ -60,13 +60,13 @@ RCT_EXPORT_METHOD(stopSharedAdvertisingBeacon)
   NSLog(@"Turned off advertising.");
 }
 
-- (void)createBeaconRegionWithString:(NSString *)uuid identifier:(NSString *)identifier
+- (void)createBeaconRegionWithString:(NSString *)uuid identifier:(NSString *)identifier major:(int)major minor:(int)minor
 {
     if (self.beaconRegion)
         return;
 
     NSUUID *proximityUUID = [[NSUUID alloc] initWithUUIDString:uuid];
-    self.beaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:proximityUUID identifier:identifier];
+    self.beaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:proximityUUID identifier:identifier major:major minor:minor];
     self.beaconRegion.notifyEntryStateOnDisplay = YES;
 }
 
@@ -90,8 +90,8 @@ RCT_EXPORT_METHOD(stopSharedAdvertisingBeacon)
     time_t t;
     srand((unsigned) time(&t));
     CLBeaconRegion *region = [[CLBeaconRegion alloc] initWithProximityUUID:self.beaconRegion.proximityUUID
-                                                                     major:rand()
-                                                                     minor:rand()
+                                                                     major:self.beaconRegion.major,
+                                                                     minor:self.beaconRegion.minor,
                                                                 identifier:self.beaconRegion.identifier];
     NSDictionary *beaconPeripheralData = [region peripheralDataWithMeasuredPower:nil];
     [self.peripheralManager startAdvertising:beaconPeripheralData];
