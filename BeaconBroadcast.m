@@ -1,10 +1,12 @@
 #import "BeaconBroadcast.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface BeaconBroadcast()
 
-@property (nonatomic, strong) CLLocationManager *locationManager;
-@property (nonatomic, strong) CLBeaconRegion *beaconRegion;
-@property (nonatomic, strong) CBPeripheralManager *peripheralManager;
+@property (nonatomic, strong, nullable) CLLocationManager *locationManager;
+@property (nonatomic, strong, nullable) CLBeaconRegion *beaconRegion;
+@property (nonatomic, strong, nullable) CBPeripheralManager *peripheralManager;
 
 @end
 
@@ -12,7 +14,7 @@
 
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_METHOD(startSharedAdvertisingBeaconWithString:(NSString *)uuid identifier:(NSString *)identifier major:(int)major minor:(int)minor)
+RCT_EXPORT_METHOD(startSharedAdvertisingBeaconWithString:(NSString *)uuid identifier:(NSString *)identifier major:(NSInteger)major minor:(NSInteger)minor)
 {
     [[BeaconBroadcast sharedInstance] startAdvertisingBeaconWithString: uuid identifier: identifier major: major minor: minor];
 }
@@ -24,28 +26,22 @@ RCT_EXPORT_METHOD(stopSharedAdvertisingBeacon)
 
 #pragma mark - Common
 
-+ (id)sharedInstance
++ (instancetype)sharedInstance
 {
-    // structure used to test whether the block has completed or not
-    static dispatch_once_t p = 0;
-
-    // initialize sharedObject as nil (first call only)
-    __strong static id _sharedObject = nil;
-
-    // executes a block object once and only once for the lifetime of an application
+    static dispatch_once_t p;
+    static id _sharedObject;
     dispatch_once(&p, ^{
         _sharedObject = [[self alloc] init];
     });
 
-    // returns the same object each time
     return _sharedObject;
 }
 
-- (void)startAdvertisingBeaconWithString:(NSString *)uuid identifier:(NSString *)identifier
+- (void)startAdvertisingBeaconWithString:(NSString *)uuid identifier:(NSString *)identifier major:(NSInteger)major minor:(NSInteger)minor
 {
   NSLog(@"Turning on advertising...");
 
-  [self createBeaconRegionWithString:uuid identifier:identifier];
+  [self createBeaconRegionWithString:uuid identifier:identifier major:major minor:minor];
 
   if (!self.peripheralManager)
       self.peripheralManager = [[CBPeripheralManager alloc] initWithDelegate:self queue:nil options:nil];
@@ -60,22 +56,14 @@ RCT_EXPORT_METHOD(stopSharedAdvertisingBeacon)
   NSLog(@"Turned off advertising.");
 }
 
-- (void)createBeaconRegionWithString:(NSString *)uuid identifier:(NSString *)identifier major:(int)major minor:(int)minor
+- (void)createBeaconRegionWithString:(NSString *)uuid identifier:(NSString *)identifier major:(NSInteger)major minor:(NSInteger)minor
 {
     if (self.beaconRegion)
         return;
 
     NSUUID *proximityUUID = [[NSUUID alloc] initWithUUIDString:uuid];
-    self.beaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:proximityUUID identifier:identifier major:major minor:minor];
+    self.beaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:proximityUUID major:major minor:minor identifier:identifier];
     self.beaconRegion.notifyEntryStateOnDisplay = YES;
-}
-
-- (void)createLocationManager
-{
-    if (!self.locationManager) {
-        self.locationManager = [[CLLocationManager alloc] init];
-        self.locationManager.delegate = self;
-    }
 }
 
 #pragma mark - Beacon advertising
@@ -87,8 +75,6 @@ RCT_EXPORT_METHOD(stopSharedAdvertisingBeacon)
         return;
     }
 
-    time_t t;
-    srand((unsigned) time(&t));
     CLBeaconRegion *region = [[CLBeaconRegion alloc] initWithProximityUUID:self.beaconRegion.proximityUUID
                                                                      major:self.beaconRegion.major
                                                                      minor:self.beaconRegion.minor
@@ -100,7 +86,7 @@ RCT_EXPORT_METHOD(stopSharedAdvertisingBeacon)
 }
 
 #pragma mark - Beacon advertising delegate methods
-- (void)peripheralManagerDidStartAdvertising:(CBPeripheralManager *)peripheralManager error:(NSError *)error
+- (void)peripheralManagerDidStartAdvertising:(CBPeripheralManager *)peripheralManager error:(nullable NSError *)error
 {
     if (error) {
         NSLog(@"Couldn't turn on advertising: %@", error);
@@ -125,3 +111,5 @@ RCT_EXPORT_METHOD(stopSharedAdvertisingBeacon)
 
 
 @end
+
+NS_ASSUME_NONNULL_END
