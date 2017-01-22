@@ -59,9 +59,6 @@ RCT_EXPORT_METHOD(stopSharedAdvertisingBeacon)
 
 - (void)createBeaconRegionWithString:(NSString *)uuid identifier:(NSString *)identifier major:(NSInteger)major minor:(NSInteger)minor
 {
-    if (self.beaconRegion)
-        return;
-
     NSUUID *proximityUUID = [[NSUUID alloc] initWithUUIDString:uuid];
     self.beaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:proximityUUID major:major minor:minor identifier:identifier];
     self.beaconRegion.notifyEntryStateOnDisplay = YES;
@@ -77,7 +74,8 @@ RCT_EXPORT_METHOD(stopSharedAdvertisingBeacon)
     }
 
     CLBeaconRegion *region = [[CLBeaconRegion alloc] initWithProximityUUID:self.beaconRegion.proximityUUID
-                                                                     major:((uint16_t)self.beaconRegion.major) >> 4                                                                  minor:((uint16_t)self.beaconRegion.minor) >> 4
+                                                                major:((uint16_t)self.beaconRegion.major) >> 4
+                                                                minor:((uint16_t)self.beaconRegion.minor) >> 4
                                                                 identifier:self.beaconRegion.identifier];
     NSDictionary *beaconPeripheralData = [region peripheralDataWithMeasuredPower:nil];
     [self.peripheralManager startAdvertising:beaconPeripheralData];
