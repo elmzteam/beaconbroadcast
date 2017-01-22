@@ -44,8 +44,7 @@ RCT_EXPORT_METHOD(stopSharedAdvertisingBeacon)
 
   [self createBeaconRegionWithString:uuid identifier:identifier major:major minor:minor];
 
-  if (!self.peripheralManager)
-      self.peripheralManager = [[CBPeripheralManager alloc] initWithDelegate:self queue:nil options:nil];
+   self.peripheralManager = [[CBPeripheralManager alloc] initWithDelegate:self queue:nil options:nil];
 
   [self turnOnAdvertising];
 }
